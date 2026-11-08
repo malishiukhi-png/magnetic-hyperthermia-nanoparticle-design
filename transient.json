@@ -1,0 +1,81 @@
+{
+ "fd_vs_analytic_maxrelerr": 0.0039097890371723515,
+ "uniform": {
+  "Q_MWm3": 0.1347,
+  "t90pct_center_min": 14.8,
+  "t90pct_edge_min": 20.3,
+  "t_center_42_min": 3.2666666666666666,
+  "t_edge_41_min": 12.233333333333333,
+  "cem_30": {
+   "center": 110.3,
+   "edge": 2.53,
+   "frac_ge10": 64,
+   "frac_ge60": 11,
+   "T90": 42.0
+  },
+  "cem_60": {
+   "center": 321.7,
+   "edge": 8.97,
+   "frac_ge10": 97,
+   "frac_ge60": 47,
+   "T90": 42.2
+  },
+  "cem_60_plus_cooling": {
+   "center": 326.5,
+   "edge": 9.2
+  }
+ },
+ "nonuniform": {
+  "R/2": {
+   "same_mass": {
+    "center": 49.1,
+    "edge": 42.0,
+    "frac42": 97,
+    "frac46": 17,
+    "T90": 42.2
+   },
+   "edge42": {
+    "dose_factor": 1.01,
+    "center": 49.2,
+    "frac46": 18,
+    "frac50": 0
+   }
+  },
+  "R/3": {
+   "same_mass": {
+    "center": 54.0,
+    "edge": 41.9,
+    "frac42": 94,
+    "frac46": 26,
+    "T90": 42.2
+   },
+   "edge42": {
+    "dose_factor": 1.02,
+    "center": 54.4,
+    "frac46": 27,
+    "frac50": 7
+   }
+  },
+  "uniform": {
+   "center": 45.9,
+   "edge": 42.0,
+   "frac42": 100,
+   "frac46": 0,
+   "T90": 42.2
+  }
+ },
+ "perfusion": {
+  "0.00025": {
+   "center_ss": 46.9,
+   "edge_ss": 42.7,
+   "cem60_center": 553.8,
+   "cem60_edge": 20.86
+  },
+  "0.001": {
+   "center_ss": 44.6,
+   "edge_ss": 41.0,
+   "cem60_center": 147.6,
+   "cem60_edge": 2.91
+  }
+ }
+}
