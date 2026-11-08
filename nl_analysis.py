@@ -155,6 +155,12 @@ r = select(group='lowalpha')
 if r:
     dm, sm = opt([x['d'] for x in r], [x['sar'] for x in r])
     R['lowalpha'] = dict(alpha=0.0015, d=[x['d'] for x in r], sar=[round(x['sar'], 1) for x in r], se=[round(x['se'], 1) for x in r], opt=[round(dm, 1), round(sm, 0)])
+# ---- intermediate damping, same conditions: where does the optimum of 22 nm begin to move? ------------------------
+R['damping'] = {}
+for a in sorted({x['alpha'] for x in rows if x['group'] == 'damping'}):
+    r = select(group='damping', alpha=a)
+    dm, sm = opt([x['d'] for x in r], [x['sar'] for x in r])
+    R['damping'][str(a)] = dict(d=[x['d'] for x in r], sar=[round(x['sar'], 1) for x in r], se=[round(x['se'], 1) for x in r], opt=[round(dm, 1), round(sm, 0)])
 # ---- Monte Carlo ---------------------------------------------------------------------------------------------
 mcr =[r for r in rows if r['group'] == 'mc']
 S = json.load(open(os.path.dirname(os.path.abspath(RUNS)) + '/mc_inputs.json'))

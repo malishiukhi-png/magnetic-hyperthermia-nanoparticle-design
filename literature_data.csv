@@ -17,3 +17,5 @@ source,sample,median_or_mean_diameter_nm,sigma_or_sd,medium,H_kA_per_m,f_kHz,SAR
 "Cabrera 2018, text",21 nm maghemite,21,6,water-glycerol (highest viscosity),20,100,48,3,TEM mean +- s.d.
 "Cabrera 2018, text",11 nm magnetite,11,4,aggregates in water (DH 311 nm),20,100,37,3,TEM mean +- s.d.
 "Cabrera 2018, text",21 nm maghemite,21,6,aggregates in water (DH 303 nm),20,100,31,2,TEM mean +- s.d.
+"Tong 2017, text",40 nm magnetite,40.4,6.3,water,9.35,325,1026,,W per g Fe; SAR values for other sizes only in their Fig. 2
+"Tong 2017, text",40 nm magnetite,40.4,6.3,water,20.7,325,2560,,W per g Fe

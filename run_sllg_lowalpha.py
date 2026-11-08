@@ -1,5 +1,5 @@
 """Additional sLLG runs appended to sllg_runs.jsonl: the 11 nm sample of Cabrera et al. (2018) with the anisotropy and damping of
-their loop simulations, and the size dependence at 15 kA/m and 300 kHz with alpha = 0.0015. Needs the compiled sllg program in this folder."""
+their loop simulations, and the size dependence at 15 kA/m and 300 kHz for alpha = 0.0015-0.03. Needs the compiled sllg program in this folder."""
 import json, os, subprocess, threading, queue, zlib
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -22,6 +22,8 @@ cab = dict(group='cabrera', d=10.3, sigma=0.352, sample='11nm', H=20e3, f=100e3,
 low = dict(group='lowalpha', sigma=0.0, alpha=0.0015, H=15e3, f=300e3, Ms=446e3, K=13e3, N=1024, ncyc=4, T=310.15)
 jobs = [dict(cab, alpha=a, K=K) for K in (3400.0, 2900.0) for a in (0.0015, 0.1, 1.0)] + [dict(cab, alpha=0.0015, K=4700.0), dict(cab, alpha=0.0015, K=13000.0)]
 jobs += [dict(low, d=float(d)) for d in range(14, 34, 2)]
+dmp = dict(low, group='damping')
+jobs += [dict(dmp, d=float(d), alpha=a) for a in (0.005, 0.01, 0.03) for d in range(14, 32, 2)]
 q = queue.Queue(); [q.put(j) for j in jobs]
 lock = threading.Lock()
 
