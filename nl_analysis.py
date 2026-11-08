@@ -150,8 +150,13 @@ for K in (9e3, 13e3, 20e3, 30e3):
 R['cabrera'] = []
 for r in select(group='cabrera'):
     R['cabrera'].append(dict(sample=r['sample'], d0=r['d'], sigma=r['sigma'], alpha=r['alpha'], K=r['K'] / 1e3, sar=round(r['sar'], 1), se=round(r['se'], 1)))
+# ---- low damping (alpha = 0.0015, as in the loop simulations of Cabrera et al.), 15 kA/m, 300 kHz ---------------
+r = select(group='lowalpha')
+if r:
+    dm, sm = opt([x['d'] for x in r], [x['sar'] for x in r])
+    R['lowalpha'] = dict(alpha=0.0015, d=[x['d'] for x in r], sar=[round(x['sar'], 1) for x in r], se=[round(x['se'], 1) for x in r], opt=[round(dm, 1), round(sm, 0)])
 # ---- Monte Carlo ---------------------------------------------------------------------------------------------
-mcr = [r for r in rows if r['group'] == 'mc']
+mcr =[r for r in rows if r['group'] == 'mc']
 S = json.load(open(os.path.dirname(os.path.abspath(RUNS)) + '/mc_inputs.json'))
 by = {}
 for r in mcr: by.setdefault(r['mc'], {})[r['d']] = r['sar']

@@ -10,7 +10,10 @@ source,sample,median_or_mean_diameter_nm,sigma_or_sd,medium,H_kA_per_m,f_kHz,SAR
 "Khandhar 2012, digitized Fig. 7",broad series,14,0.31,water,14,373,101.2,3,log-normal sigma; reading uncertainty
 "Khandhar 2012, digitized Fig. 7",broad series,16,0.36,water,14,373,55.1,3,log-normal sigma; reading uncertainty
 "Khandhar 2012, digitized Fig. 7",broad series,16.5,0.36,water,14,373,30.1,3,log-normal sigma; reading uncertainty
-"Cabrera 2018, text",11 nm magnetite,11,4,live MCF-7 cells,20,100,36,1,TEM mean +- s.d.
-"Cabrera 2018, text",11 nm magnetite,11,4,water,20,100,40,2,TEM mean +- s.d.
+"Cabrera 2018, text",11 nm magnetite,11,4,live MCF-7 cells,20,100,36,1,TEM mean +- s.d.; their loop simulation used K = 2.9 kJ/m3 and alpha = 0.0015
+"Cabrera 2018, text",11 nm magnetite,11,4,water,20,100,40,2,TEM mean +- s.d.; their loop simulation used K = 3.4 kJ/m3 and alpha = 0.0015
 "Cabrera 2018, text",21 nm maghemite,21,6,live MCF-7 cells,20,100,38,1,TEM mean +- s.d.
 "Cabrera 2018, text",21 nm maghemite,21,6,water,20,100,76,4,TEM mean +- s.d.
+"Cabrera 2018, text",21 nm maghemite,21,6,water-glycerol (highest viscosity),20,100,48,3,TEM mean +- s.d.
+"Cabrera 2018, text",11 nm magnetite,11,4,aggregates in water (DH 311 nm),20,100,37,3,TEM mean +- s.d.
+"Cabrera 2018, text",21 nm maghemite,21,6,aggregates in water (DH 303 nm),20,100,31,2,TEM mean +- s.d.

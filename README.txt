@@ -44,6 +44,8 @@ Revised analysis (nonlinear SAR as the main model; added for the submitted versi
                     -> sllg_runs.jsonl, mc_inputs.json  (about 2.5 h on two cores)
   nl_analysis.py    python nl_analysis.py sllg_runs.jsonl -> nl_results.json: optimum per field, dipolar coupling, nonlinear dose,
                     polydispersity, anisotropy, live-cell comparison, Monte Carlo statistics
+  run_sllg_lowalpha.py      Additional cases appended to sllg_runs.jsonl (11 nm live-cell sample with the K and alpha of the cited loop simulations; alpha = 0.0015 at 15 kA/m, 300 kHz)
+  llg_khandhar_lowalpha.py  alpha = 0.0015 at the conditions of the measured SLP series -> llg_khandhar_a0.0015.json, exp_compare_lowalpha.json
   fig_nl.py         Figures 1, 3, 4, 6 of the manuscript from nl_results.json
   Figure 2 = fig_nonlinear.png, Figure 5 = fig_experiment.png, Figure 7 = fig_transient.png.
   The linear-response results and the machine-learning surrogate are in the Supplementary material (figures.py, uncertainty.py, ml.py, fig_ml.py).

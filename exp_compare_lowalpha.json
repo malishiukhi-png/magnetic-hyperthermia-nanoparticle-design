@@ -1,0 +1,44 @@
+{
+ "alpha": 0.0015,
+ "narrow": [
+  {
+   "d0": 12,
+   "sigma": 0.01,
+   "measured": 23.5,
+   "model": 157.2
+  },
+  {
+   "d0": 13,
+   "sigma": 0.1,
+   "measured": 54.1,
+   "model": 282.5
+  },
+  {
+   "d0": 14,
+   "sigma": 0.21,
+   "measured": 87.3,
+   "model": 240.8
+  },
+  {
+   "d0": 15,
+   "sigma": 0.23,
+   "measured": 100.2,
+   "model": 199.7
+  },
+  {
+   "d0": 16,
+   "sigma": 0.16,
+   "measured": 141.0,
+   "model": 237.7
+  },
+  {
+   "d0": 18,
+   "sigma": 0.34,
+   "measured": 43.3,
+   "model": 65.8
+  }
+ ],
+ "peak_d0": 13,
+ "peak_value": 282.5,
+ "scale_to_measured": 0.366
+}
