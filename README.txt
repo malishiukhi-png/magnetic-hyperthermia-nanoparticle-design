@@ -1,57 +1,76 @@
-Code and data for "Magnetite Nanoparticle Design for Magnetic Hyperthermia under Clinical Field Limits: From Neel Dynamics to Tumor Thermal Dose"
+Code for "Magnetite Nanoparticle Design for Magnetic Hyperthermia under Clinical Field Limits: From Néel Dynamics to Tumor Thermal Dose"
+Requirements: Python 3 with numpy, scipy, matplotlib, scikit-learn; numba for langevin.py and llg.py; a C compiler (gcc) for llg_c.py.
 
-model.py      Rosensweig linear-response model (Neel/Brownian relaxation, log-normal size distribution) and the
-              analytical steady-state Pennes bioheat solution for a spherical tumor.
-figures.py    Physics results: Figures 2-5 and results.json (every number quoted in Sections 3-1 to 3-4).
-ml.py         Generates 20,000 simulated cases, trains random forest / gradient boosting / neural-network surrogates,
-              permutation importance and surrogate-based inverse design -> ml_results.json (Table 3, Section 3-5).
-fig_ml.py     Figure 6 from ml_results.json.
-fig_workflow.py  Figure 1 (modeling workflow schematic).
-Run in order: python figures.py ; python ml.py ; python fig_ml.py      (numpy, scipy, matplotlib, scikit-learn)
+Linear-response model and tumor heating (Sections 2.1-2.6, 3.1, 3.4, 3.5; Figures 2-4 and 7; Table 5)
+  model.py          Rosensweig linear-response model (Neel/Brownian relaxation, log-normal size distribution) and the
+                    analytical steady-state Pennes bioheat solution for a spherical tumor.
+  figures.py        Figures 2-4 and 7 (tumor) and results.json (numbers quoted in Sections 3.1 and 3.4).
+  uncertainty.py    Monte Carlo uncertainty and sensitivity analysis -> uncertainty.json (Table 5; about 1 min).
+  transient.py      Transient Pennes bioheat (finite volume, Crank-Nicolson), CEM43 thermal dose and Gaussian loading
+                    -> transient.json and Figure 8 (a few seconds).
+  fig_workflow.py   Figure 1.
+  Note on Eq. (6): the size distribution is integrated over ln d on a uniform grid, which is equivalent to the number
+  density g(d) = exp[-ln^2(d/d0)/(2 sigma^2)]/(d sigma sqrt(2 pi)) in d.
 
-Uncertainty and sensitivity analysis (Section 2-6, Table 4):
-  python3 uncertainty.py   -> uncertainty.json (2000 Monte Carlo samples, about 1 min)
+Nonlinear Neel dynamics (Sections 2.7, 3.2; Figure 5; Table 3)
+  nonlinear.py      Thermally activated two-state model of immobilized particles vs. linear response -> nonlinear.json
+  langevin.py       Overdamped stochastic simulation (numba): python langevin.py 15k300 | 18k278 | conv | hsweep
+                    -> langevin_*.json (20-60 min each)
+  llg.py            Stochastic Landau-Lifshitz-Gilbert (sLLG) dynamics, uniaxial anisotropy, numba version used for
+                    llg_a0.1.json, llg_a1.json, llg_conv.json (time-step check, llg_conv.py) and llg_khandhar_a*.json
+                    (llg_khandhar.py).
+  llg_kernel.c      Compiled sLLG kernel (Heun scheme, Brown thermal field) for uniaxial or cubic anisotropy.
+  llg_c.py          Python driver of llg_kernel.c; compiles it on first use (gcc -O3 -shared -fPIC). Cubic anisotropy:
+                    K1 = -11 kJ/m3 with randomly oriented crystal axes, started in a random <111> minimum.
+  val_c.py          Check of the compiled kernel against llg_a1.json / llg_a0.1.json (e.g., 18 nm, alpha = 1; 20 nm, alpha = 0.1).
+  llg_jobs.py       Runs the new sLLG series (resumes from the stored JSON files):
+                      a001     uniaxial, alpha = 0.01, 15 kA/m, 300 kHz            -> llg_a001.json
+                      cubic1   cubic, alpha = 1, 15 kA/m, 300 kHz, 14-50 nm        -> llg_cubic1.json (jobs cubic1, cubic1x)
+                      cubic01  cubic, alpha = 0.1, 40 nm                           -> llg_cubic01.json
+                      tong_u, tong_c   uniaxial / cubic, alpha = 1, 9.35 kA/m, 325 kHz (Tong et al.) -> llg_tong_*.json
+                      kh_K23   uniaxial K = 23 kJ/m3, alpha = 1, 14 kA/m, 373 kHz (Khandhar et al.) -> llg_kh_K23.json
+                      kh_c     cubic, alpha = 1, Khandhar conditions                -> llg_kh_c.json
+                    Example: python llg_jobs.py a001 cubic1 cubic1x cubic01 tong_u tong_c kh_K23 kh_c
+                    Each size takes 3-10 min on one core. JSON rows are [diameter (nm), SAR (W/g), standard error (W/g)].
+  fig_v5.py         Figures 5 and 6 from the files above and exp_metrics.json.
 
-Note on Eq. (6): the size distribution is integrated over ln d on a uniform grid, which is
-equivalent to the number density g(d) = exp[-ln^2(d/d0)/(2 sigma^2)]/(d sigma sqrt(2 pi)) in d.
+Comparison with measurements (Sections 2.8, 3.3; Figure 6; Table 4; Supplementary Table S2)
+  khandhar_K.py     LRT comparison with Khandhar et al. for K = 13, 18, 23, 30, 41 kJ/m3 -> khandhar_K.json
+  exp_metrics.py    Log-normal (mass-weighted) averaging of all models over the samples of Khandhar et al. (SLP digitized
+                    from their Figure 7, sizes and widths from their Table 1), agreement metrics (Table 4), per-sample values
+                    (Table S2), and the sLLG results at the conditions of Tong et al. -> exp_metrics.json
+  Run after llg_jobs.py: python khandhar_K.py ; python exp_metrics.py ; python fig_v5.py
 
-Nonlinear dynamics and transient heating (Sections 2.8-2.9, 3.7-3.8, Figures 7-8):
-  nonlinear.py      Thermally activated two-state (Stoner-Wohlfarth) model of immobilized particles vs. linear response
-                    -> nonlinear.json (about 1 min)
-  langevin.py       Overdamped stochastic (Langevin) simulation of the Neel moment, 2000 particles with random easy axes
-                    python langevin.py 15k300 ; python langevin.py 18k278 ; python langevin.py conv ; python langevin.py hsweep
-                    -> langevin_15k300.json, langevin_18k278.json, langevin_conv.json, langevin_hsweep.json (20-60 min each; requires numba)
-                    Results are stochastic; reruns reproduce the published values within the stated standard errors.
-  fig_nonlinear.py  Figure 7 from the files above.
-  transient.py      Transient Pennes bioheat (finite volume, Crank-Nicolson), CEM43 thermal dose and Gaussian
-                    (non-uniform) loading -> transient.json and Figure 8 (a few seconds).
+Machine-learning surrogate (Supplementary Material, Section S1; Table S1; Figure S1)
+  ml.py             20,000 simulated LRT cases, random forest / gradient boosting / neural-network surrogates, permutation
+                    importance and surrogate-based inverse design -> ml_results.json
+  fig_ml.py         Figure S1 from ml_results.json.
 
-Stochastic LLG with explicit damping and comparison with experiment (Sections 2.8, 3.7-3.8, Figures 7-8):
-  llg.py            Stochastic Landau-Lifshitz-Gilbert dynamics (Heun scheme, Brown thermal field, free-electron gyromagnetic
-                    ratio, no calibration). python llg.py 0.1 ; python llg.py 1   -> llg_a0.1.json, llg_a1.json
-  llg_conv.py       Time-step check -> llg_conv.json
-  llg_khandhar.py   sLLG at 373 kHz and 14 kA/m with the measured Ms of Khandhar et al. -> llg_khandhar_a0.1.json, _a1.json
-  exp_compare.py    Log-normal averaging and comparison with the measured SLP of Khandhar et al. (values digitized from their
-                    Figure 7, sizes and widths from their Table 1) -> exp_compare.json and fig_experiment.png
-  fig_nonlinear.py  Figure 7 (needs nonlinear.json, langevin_15k300.json, llg_a*.json)
-  Each sLLG size takes several minutes on one core; results are stochastic within the stated standard errors.
+All stochastic results reproduce the published values within the stated standard errors when rerun.
 
-Revised analysis (nonlinear SAR as the main model; added for the submitted version):
-  sllg.c            Compiled implementation of the sLLG scheme of llg.py; each particle may have its own diameter (log-normal ensembles).
-                    gcc -O3 -march=native -ffast-math -fno-math-errno -fopenmp-simd sllg.c -o sllg -lmvec -lm
-                    Checked against llg_a*.json (333 +- 3 vs 329 +- 3 W/g at 18 nm, alpha = 1; 688 +- 1 vs 691 +- 2 W/g at 20 nm, alpha = 0.1).
-  run_sllg_queue.py Runs all new cases (field scan incl. 100 kHz/18 kA/m, log-normal ensembles, anisotropy, live-cell comparison, Monte Carlo)
-                    -> sllg_runs.jsonl, mc_inputs.json  (about 2.5 h on two cores)
-  nl_analysis.py    python nl_analysis.py sllg_runs.jsonl -> nl_results.json: optimum per field, dipolar coupling, nonlinear dose,
-                    polydispersity, anisotropy, live-cell comparison, Monte Carlo statistics
-  run_sllg_lowalpha.py      Additional cases appended to sllg_runs.jsonl (11 nm live-cell sample with the K and alpha of the cited loop simulations; alpha = 0.0015 at 15 kA/m, 300 kHz)
-  llg_khandhar_lowalpha.py  alpha = 0.0015 at the conditions of the measured SLP series -> llg_khandhar_a0.0015.json, exp_compare_lowalpha.json
-  sllg_dip.c, run_sllg_clusters.py   sLLG with explicit dipolar coupling in random clusters -> sllg_cluster_runs.jsonl
-                    gcc -O3 -march=native -ffast-math -fno-math-errno -fopenmp-simd sllg_dip.c -o sllg_dip -lm -lmvec ; ./sllg_dip selftest
-  sllg_rot.c, run_sllg_water.py      sLLG with Brownian rotation in a liquid (series of Tong et al., Khandhar et al., Cabrera et al.) -> sllg_water_runs.jsonl
-                    gcc -O3 -march=native -ffast-math -fno-math-errno -fopenmp-simd sllg_rot.c -o sllg_rot -lm -lmvec ; ./sllg_rot selftest
-  cluster_water_analysis.py          Summary of both sets -> cluster_water_results.json (Sections 3.4 and 3.5, Tables S5-S7)
-  fig_nl.py         Figures 1, 3, 4, 6 of the manuscript from nl_results.json
-  Figure 2 = fig_nonlinear.png, Figure 5 = fig_experiment.png, Figure 7 = fig_transient.png.
-  The linear-response results and the machine-learning surrogate are in the Supplementary material (figures.py, uncertainty.py, ml.py, fig_ml.py).
-  literature_data.csv  Measured values used for comparison (Khandhar et al. digitized; Cabrera et al. from the text).
+Extensions of the sLLG model and additional analyses of the revised manuscript (Sections 2.6, 2.7, 3.2-3.6; Tables 3, 5, 6;
+Supplementary Tables S3-S9). Build the C programs with gcc and OpenMP:
+  gcc -O3 -march=native -ffast-math -fno-math-errno -fopenmp sllg.c -o sllg -lm -lmvec        (also sllg_dip.c, sllg_rot.c)
+  sllg.c                  Isolated immobilized particles, uniaxial anisotropy, per-particle diameters (log-normal ensembles).
+                          Arguments: d(nm) sigma alpha H(A/m) f(Hz) Ms(A/m) K(J/m3) N ncycles seed T(K); prints SAR (W/kg)
+                          and its standard error.
+  sllg_dip.c              Random clusters of 32 particles with explicit dipolar coupling (Section 2.7).
+  sllg_rot.c              Coupled Neel and Brownian rotation of isolated particles in a liquid (Section 2.7).
+  run_sllg_queue.py       Main series: field scenarios, live-cell samples, polydispersity, anisotropy, Monte Carlo input sets
+                          (mc_inputs.json) -> sllg_runs.jsonl
+  run_sllg_lowalpha.py    Low damping (alpha = 0.0015-0.03) and the loop-simulation parameters of Cabrera et al. -> sllg_runs.jsonl
+  run_sllg_K23.py         K = 23 kJ/m3 at 15 kA/m/300 kHz, 18 kA/m/278 kHz and 18 kA/m/100 kHz -> k23.jsonl (Table 3, Table S3)
+  run_sllg_convergence.py Random seeds, number of particles and number of cycles -> conv.jsonl (Table S5)
+  xcheck_kernels.py       Cross-check of sllg.c against llg_kernel.c -> xcheck_k23.json (Section 2.7)
+  run_sllg_clusters.py    Dipolar clusters -> sllg_cluster_runs.jsonl; run_sllg_water.py: Brownian rotation -> sllg_water_runs.jsonl
+  cluster_water_analysis.py  -> cluster_water_results.json (Section 3.6, Table 6, Tables S6, S7, S9)
+  nl_analysis.py          Post-processing of sllg_runs.jsonl (field scenarios, damping, sLLG Monte Carlo statistics and Spearman
+                          correlations, live-cell comparison) -> nl_results.json (Tables 3 and 5)
+  llg_khandhar_lowalpha.py   Low damping at the conditions of Khandhar et al. -> llg_khandhar_a0.0015.json, exp_compare_lowalpha.json
+  dose_coverage.py        Thermal-dose coverage of the transient tumor model -> dose_coverage.json (Section 3.4, Table S8)
+  literature_data.csv     Measured values used for the comparisons (digitized or taken from the cited publications).
+  The run_*.py scripts resume from their output files. Each sLLG size takes about one minute per core (1024 particles,
+  four cycles); results are stochastic and reproduce the stored values within their standard errors.
+
+Software used for the published results: Python 3.13, NumPy 2.5, SciPy 1.18, scikit-learn 1.9, Matplotlib 3.11, numba
+(langevin.py, llg.py), gcc 13 (C kernels).

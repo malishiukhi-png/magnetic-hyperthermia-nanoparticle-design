@@ -79,14 +79,14 @@ int main(int argc, char **argv) {
     long nsteps = nper * ncyc, rec = nper / 2000; if (rec < 1) rec = 1;
     rng_t rg; seed_rng(&rg, seed);
 #define AL(n) aligned_alloc(64, (n) * 8)
-    double *nx = AL(N), *ny = AL(N), *nz = AL(N), *mx = AL(N), *my = AL(N), *mz = AL(N), *Hs = AL(N), *wt = AL(N), *Ai = AL(N), *Bi = AL(N);
+    double *nx = AL(N), *ny = AL(N), *nz = AL(N), *mx = AL(N), *my = AL(N), *mz = AL(N), *Hs = AL(N), *wt = AL(N), *Acoef = AL(N), *Bi = AL(N);
     double Vtot = 0;
     for (int i = 0; i < N; i++) {
         double dd = d0;
         if (sigma > 0) { double g; do gauss_block(&rg, &g, 1); while (fabs(g) > 4.0); dd = d0 * exp(sigma * g); }
         double V = M_PI * dd * dd * dd / 6.0, dh = dd + 2 * shell, xi = 6.0 * eta * M_PI * dh * dh * dh / 6.0;
         Hs[i] = sqrt(2.0 * alpha * KB * T / (GAMMA * MU0 * MU0 * Ms * V * dt));
-        Ai[i] = 2.0 * K * V / xi; Bi[i] = sqrt(2.0 * KB * T / (xi * dt));
+        Acoef[i] = 2.0 * K * V / xi; Bi[i] = sqrt(2.0 * KB * T / (xi * dt));
         wt[i] = V; Vtot += V;
         double u = 2.0 * unif(&rg) - 1.0, ph = 2.0 * M_PI * unif(&rg), s = sqrt(1.0 - u * u);
         nx[i] = s * cos(ph); ny[i] = s * sin(ph); nz[i] = u;
@@ -113,7 +113,7 @@ int main(int argc, char **argv) {
             gauss_block(&rb[b], gx, BLK); gauss_block(&rb[b], gy, BLK); gauss_block(&rb[b], gz, BLK);
             gauss_block(&rb[b], ux, BLK); gauss_block(&rb[b], uy, BLK); gauss_block(&rb[b], uz, BLK);
             double *restrict Mx = mx + i0, *restrict My = my + i0, *restrict Mz = mz + i0, *restrict Nx = nx + i0, *restrict Ny = ny + i0, *restrict Nz = nz + i0;
-            double *restrict Hh = Hs + i0, *restrict A = Ai + i0, *restrict Bb = Bi + i0;
+            double *restrict Hh = Hs + i0, *restrict A = Acoef + i0, *restrict Bb = Bi + i0;
 #pragma omp simd
             for (int i = 0; i < BLK; i++) {
                 double tx = Hh[i] * gx[i], ty = Hh[i] * gy[i], tz = Hh[i] * gz[i];
